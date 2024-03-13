@@ -6,13 +6,12 @@ use std::io;
 use codespan_reporting::diagnostic as d;
 use codespan_reporting::term;
 use codespan_reporting::term::termcolor::WriteColor;
-pub use codespan_reporting::term::termcolor;
 
-use crate::alloc::prelude::*;
 use crate::alloc;
-use crate::Sources;
+use crate::alloc::prelude::*;
 use crate::ast::Spanned;
-use crate::workspace::{Diagnostics, Diagnostic, FatalDiagnostic};
+use crate::workspace::{Diagnostic, Diagnostics, FatalDiagnostic};
+use crate::Sources;
 
 /// Errors that can be raised when formatting diagnostics.
 #[derive(Debug)]
@@ -71,11 +70,7 @@ impl Diagnostics {
     /// hints.
     ///
     /// See [prepare][crate::prepare] for how to use.
-    pub fn emit<O>(
-        &self,
-        out: &mut O,
-        sources: &Sources,
-    ) -> Result<(), EmitError>
+    pub fn emit<O>(&self, out: &mut O, sources: &Sources) -> Result<(), EmitError>
     where
         O: WriteColor,
     {
@@ -110,7 +105,10 @@ where
     let mut labels = rust_alloc::vec::Vec::new();
 
     let span = this.error().span();
-    labels.push(d::Label::primary(this.source_id(), span.range()).with_message(this.error().try_to_string()?.into_std()));
+    labels.push(
+        d::Label::primary(this.source_id(), span.range())
+            .with_message(this.error().try_to_string()?.into_std()),
+    );
 
     let diagnostic = d::Diagnostic::error()
         .with_message(this.error().try_to_string()?.into_std())
