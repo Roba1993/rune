@@ -145,7 +145,6 @@ pub(crate) fn build(
     }
 
     let search_index = RelativePath::new("index.js");
-    let root_index = RelativePath::new("index.html");
 
     let mut cx = Ctxt {
         state: State::default(),
@@ -153,7 +152,6 @@ pub(crate) fn build(
         name,
         context: &context,
         search_index: Some(search_index),
-        root_index,
         fonts: &fonts,
         css: &css,
         js: &js,
@@ -264,7 +262,6 @@ fn build_search_index(cx: &Ctxt) -> Result<String> {
 struct Shared<'a> {
     data_path: Option<&'a RelativePath>,
     search_index: Option<RelativePathBuf>,
-    root_index: RelativePathBuf,
     fonts: Vec<RelativePathBuf>,
     css: Vec<RelativePathBuf>,
     js: Vec<RelativePathBuf>,
@@ -331,7 +328,6 @@ pub(crate) struct Ctxt<'a, 'm> {
     name: &'a str,
     context: &'a Context<'m>,
     search_index: Option<&'a RelativePath>,
-    root_index: &'a RelativePath,
     fonts: &'a [RelativePathBuf],
     css: &'a [RelativePathBuf],
     js: &'a [RelativePathBuf],
@@ -386,7 +382,6 @@ impl<'m> Ctxt<'_, 'm> {
         Ok(Shared {
             data_path: self.state.path.parent(),
             search_index: self.search_index.map(|p| dir.relative(p)),
-            root_index: dir.relative(self.root_index),
             fonts: self.fonts.iter().map(|f| dir.relative(f)).try_collect()?,
             css: self.css.iter().map(|f| dir.relative(f)).try_collect()?,
             js: self.js.iter().map(|f| dir.relative(f)).try_collect()?,
@@ -501,7 +496,7 @@ impl<'m> Ctxt<'_, 'm> {
         Ok(self.dir().relative(path))
     }
 
-    /// Build backlinks for the current item.
+    /// Build banklinks for the current item.
     fn module_path_html(&self, meta: Meta<'_>, is_module: bool) -> Result<String> {
         let mut module = Vec::new();
         let item = meta.item.context("Missing module item")?;
@@ -844,9 +839,6 @@ fn build_index<'m>(
         modules.try_push(Module { item, path })?;
     }
 
-    // sort the modules by name
-    modules.sort_by_key(|module| module.item.as_crate().unwrap_or(""));
-
     Ok(Builder::new(cx, move |cx| {
         cx.index_template.render(&Params {
             shared: cx.shared()?,
@@ -1030,12 +1022,6 @@ fn module<'m>(
                     queue.try_push_front(Build::Module(m))?;
                     let path = cx.item_path(item, ItemKind::Module)?;
                     let name = item.last().context("missing name of module")?;
-
-                    // Prevent multiple entries of a module, with no documentation
-                    modules.retain(|module: &Module<'_>| {
-                        !(module.name == name && module.doc.is_none())
-                    });
-
                     modules.try_push(Module {
                         item,
                         name,

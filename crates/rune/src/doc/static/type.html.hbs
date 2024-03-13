@@ -1,5 +1,5 @@
 {{#> layout}}
-<div class="title-wrapper"><h3 class="title">{{what}} {{literal module}}::<span class="{{what_class}}">{{name}}</span></h3><a class="overview" href="{{literal root_index}}">Overview</a></div>
+<h3 class="title">{{what}} {{literal module}}::<span class="{{what_class}}">{{name}}</span></h3>
 {{#if doc}}{{literal doc}}{{/if}}
 
 {{#if methods}}
@@ -22,8 +22,7 @@
 {{#each protocols}}
     <div class="item item-fn">
         <div id="protocol.{{this.name}}" class="item-title">
-        protocol <a href="#protocol.{{this.name}}" class="protocol">{{this.name}}</a> {{field}}
-        {{#if this.deprecated}}<div class="deprecated"><span class="heading">Deprecated:</span><span class="content">{{this.deprecated}}</span></div>{{/if}}
+        protocol <a href="#protocol.{{this.name}}" class="protocol">{{this.name}}</a>
         </div>
         {{#if this.repr}}{{literal this.repr}}{{/if}}
         {{#if this.doc}}{{literal this.doc}}{{/if}}
