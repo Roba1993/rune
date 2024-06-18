@@ -1,6 +1,6 @@
 mod enum_;
 mod js;
-mod markdown;
+pub(crate) mod markdown;
 mod type_;
 
 use core::fmt;
